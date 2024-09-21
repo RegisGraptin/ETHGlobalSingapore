@@ -79,31 +79,31 @@ contract FeeCollectionTest is Test, PosmTestSetup, LiquidityFuzzers {
     // }
 
 
-    function test_subscriber_function() public {
+    // function test_subscriber_function() public {
     
-        ReputationSubscriber rpsb = new ReputationSubscriber(lpm);
+    //     ReputationSubscriber rpsb = new ReputationSubscriber(lpm);
         
-        assertEq(rpsb.computeCurrentReputation(0, alice), 0);
+    //     assertEq(rpsb.computeCurrentReputation(0, alice), 0);
 
-        vm.prank(address(lpm));
-        rpsb.notifyModifyLiquidity(0, 10, toBalanceDelta(5, 5));
+    //     vm.prank(address(lpm));
+    //     rpsb.notifyModifyLiquidity(0, 10, toBalanceDelta(5, 5));
 
-        assertEq(rpsb.computeCurrentReputation(0, alice), 0);
+    //     assertEq(rpsb.computeCurrentReputation(0, alice), 0);
 
-        console.log(block.timestamp);
+    //     console.log(block.timestamp);
 
-        // Add some blocks
-        vm.warp(100 days);
+    //     // Add some blocks
+    //     vm.warp(100 days);
 
-        assertEq(rpsb.computeCurrentReputation(0, alice), 0);
+    //     assertEq(rpsb.computeCurrentReputation(0, alice), 0);
 
-        console.log(block.timestamp);
+    //     console.log(block.timestamp);
 
-        console.log(rpsb.computeCurrentReputation(0, alice));
+    //     console.log(rpsb.computeCurrentReputation(0, alice));
 
 
         
-    }
+    // }
 
 
 

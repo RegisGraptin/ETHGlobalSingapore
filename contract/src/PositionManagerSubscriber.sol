@@ -7,6 +7,7 @@ import {ISubscriber} from "v4-periphery/src/interfaces/ISubscriber.sol";
 
 /// @title PositionManagerSubscriber contract
 /// @dev Create a new 'ISubscriber' which can be called only by the position manager.
+/// FIXME :: Maybe called it SafePositionManagerSubscriber
 abstract contract PositionManagerSubscriber is ISubscriber {
 
     error NotAuthorizedNotifer(address sender);
