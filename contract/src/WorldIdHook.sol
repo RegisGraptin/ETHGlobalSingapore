@@ -93,42 +93,17 @@ contract Counter is BaseHook {
     // NOTE: see IHooks.sol for function documentation
     // -----------------------------------------------
 
-    function beforeSwap(address, PoolKey calldata key, IPoolManager.SwapParams calldata, bytes calldata)
-        external
-        override
-        returns (bytes4, BeforeSwapDelta, uint24)
-    {
-        beforeSwapCount[key.toId()]++;
-        return (BaseHook.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
-    }
-
-    function afterSwap(address, PoolKey calldata key, IPoolManager.SwapParams calldata, BalanceDelta, bytes calldata)
-        external
-        override
-        returns (bytes4, int128)
-    {
-        afterSwapCount[key.toId()]++;
-        return (BaseHook.afterSwap.selector, 0);
-    }
-
     function beforeAddLiquidity(
         address,
+        uint256 root,
+        uint256 nullifierHash,
+        uint256[8] calldata proof,
         PoolKey calldata key,
         IPoolManager.ModifyLiquidityParams calldata,
         bytes calldata
     ) external override returns (bytes4) {
-        beforeAddLiquidityCount[key.toId()]++;
+        verifyAndExecute(msg.sender, root, nullifierHash, proof)
         return BaseHook.beforeAddLiquidity.selector;
-    }
-
-    function beforeRemoveLiquidity(
-        address,
-        PoolKey calldata key,
-        IPoolManager.ModifyLiquidityParams calldata,
-        bytes calldata
-    ) external override returns (bytes4) {
-        beforeRemoveLiquidityCount[key.toId()]++;
-        return BaseHook.beforeRemoveLiquidity.selector;
     }
 
 	function verifyAndExecute(address signal, uint256 root, uint256 nullifierHash, uint256[8] calldata proof) public {
