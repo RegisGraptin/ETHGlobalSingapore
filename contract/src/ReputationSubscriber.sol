@@ -33,35 +33,32 @@ contract ReputationSubscriber is PositionManagerSubscriber {
         external onlyByPosm
         override
     {
-
-        // FIXME :: How do we get the user
-
         if (liquidityChange > 0) {
             // User added liquidity
-            userPositions[tokenId][msg.sender].push(
+            userPositions[tokenId][posm.msgSender()].push(
                 Position({amount: uint256(liquidityChange), startTime: block.timestamp})
             );
         } else {
             // User remove liquidity
             uint256 positionToRemove = uint256(liquidityChange);
-            uint256 i = userPositions[tokenId][msg.sender].length - 1;
+            uint256 i = userPositions[tokenId][posm.msgSender()].length - 1;
 
             while (positionToRemove > 0) {
-                uint256 lastAmount = userPositions[tokenId][msg.sender][i].amount;
+                uint256 lastAmount = userPositions[tokenId][posm.msgSender()][i].amount;
 
                 // Not enough from the last one, remove last one
                 if (positionToRemove >= lastAmount) {
-                    reputation[tokenId][msg.sender] += computePositionReputation(userPositions[tokenId][msg.sender][i]);
-                    userPositions[tokenId][msg.sender].pop();
+                    reputation[tokenId][posm.msgSender()] += computePositionReputation(userPositions[tokenId][posm.msgSender()][i]);
+                    userPositions[tokenId][posm.msgSender()].pop();
                     i -= 1;
                 } else {
                     // Update reputation accordingly
-                    reputation[tokenId][msg.sender] += computePositionReputation(
-                        Position({amount: lastAmount, startTime: userPositions[tokenId][msg.sender][i].startTime})
+                    reputation[tokenId][posm.msgSender()] += computePositionReputation(
+                        Position({amount: lastAmount, startTime: userPositions[tokenId][posm.msgSender()][i].startTime})
                     );
 
                     // Update user position
-                    userPositions[tokenId][msg.sender][i].amount -= lastAmount;
+                    userPositions[tokenId][posm.msgSender()][i].amount -= lastAmount;
 
                     // No need to proceed further
                     return;
