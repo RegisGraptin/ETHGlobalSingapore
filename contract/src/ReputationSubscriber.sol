@@ -7,6 +7,9 @@ import {ISubscriber} from "v4-periphery/src/interfaces/ISubscriber.sol";
 
 import {PositionManagerSubscriber} from "./PositionManagerSubscriber.sol";
 
+
+import "forge-std/Test.sol";
+
 contract ReputationSubscriber is PositionManagerSubscriber {
     // User position
     struct Position {
@@ -30,6 +33,8 @@ contract ReputationSubscriber is PositionManagerSubscriber {
         external onlyByPosm
         override
     {
+
+        // FIXME :: How do we get the user
 
         if (liquidityChange > 0) {
             // User added liquidity
@@ -66,7 +71,10 @@ contract ReputationSubscriber is PositionManagerSubscriber {
     }
 
     function notifyTransfer(uint256 tokenId, address previousOwner, address) external onlyByPosm override {
-        // For all the user liquidity, compute the reputation
+        /// @notice When a transfer is done, we compute the reputation of the address and delete
+        /// all open position by the user. 
+        
+        // For all user liquidity, compute the reputation
         reputation[tokenId][previousOwner] = computeCurrentReputation(tokenId, previousOwner);
 
         // Remove from the previous owner the current position

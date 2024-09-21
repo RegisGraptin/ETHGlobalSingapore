@@ -8,7 +8,7 @@ import {IHooks} from "@uniswap/v4-core/src/interfaces/IHooks.sol";
 import {Currency, CurrencyLibrary} from "@uniswap/v4-core/src/types/Currency.sol";
 import {PoolId, PoolIdLibrary} from "@uniswap/v4-core/src/types/PoolId.sol";
 import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
-import {BalanceDelta} from "@uniswap/v4-core/src/types/BalanceDelta.sol";
+import {BalanceDelta, toBalanceDelta} from "@uniswap/v4-core/src/types/BalanceDelta.sol";
 import {FixedPointMathLib} from "solmate/src/utils/FixedPointMathLib.sol";
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
@@ -62,20 +62,47 @@ contract FeeCollectionTest is Test, PosmTestSetup, LiquidityFuzzers {
     }
 
     
-    // Subscribe pool manager
-    function test_subscribe() public {
+    // // Subscribe pool manager
+    // function test_subscribe() public {
 
-        IPositionManager posm = IPositionManager(address(lpm));
+    //     IPositionManager posm = IPositionManager(address(lpm));
         
+    //     ReputationSubscriber rpsb = new ReputationSubscriber(lpm);
+    //     ISubscriber mySubscriber = ISubscriber(rpsb);
+        
+    //     uint256 tokenId = lpm.nextTokenId();
+
+    //     bytes memory optionalData = "";
+    //     posm.subscribe(tokenId, address(mySubscriber), optionalData); // FIXME :: Notice we expect address for 'mySubscriber'
+
+    //     mySubscriber.notifySubscribe(tokenId, "");
+    // }
+
+
+    function test_subscriber_function() public {
+    
         ReputationSubscriber rpsb = new ReputationSubscriber(lpm);
-        ISubscriber mySubscriber = ISubscriber(rpsb);
         
-        uint256 tokenId = lpm.nextTokenId();
+        assertEq(rpsb.computeCurrentReputation(0, alice), 0);
 
-        bytes memory optionalData = "";
-        posm.subscribe(tokenId, address(mySubscriber), optionalData); // Notice we expect address for 'mySubscriber'
+        vm.prank(address(lpm));
+        rpsb.notifyModifyLiquidity(0, 10, toBalanceDelta(5, 5));
 
-        mySubscriber.notifySubscribe(tokenId, "");
+        assertEq(rpsb.computeCurrentReputation(0, alice), 0);
+
+        console.log(block.timestamp);
+
+        // Add some blocks
+        vm.warp(100 days);
+
+        assertEq(rpsb.computeCurrentReputation(0, alice), 0);
+
+        console.log(block.timestamp);
+
+        console.log(rpsb.computeCurrentReputation(0, alice));
+
+
+        
     }
 
 

@@ -5,6 +5,8 @@ import {BalanceDelta} from "v4-core/src/types/BalanceDelta.sol";
 import {PositionManager} from "v4-periphery/src/PositionManager.sol";
 import {ISubscriber} from "v4-periphery/src/interfaces/ISubscriber.sol";
 
+/// @title PositionManagerSubscriber contract
+/// @dev Create a new 'ISubscriber' which can be called only by the position manager.
 abstract contract PositionManagerSubscriber is ISubscriber {
 
     error NotAuthorizedNotifer(address sender);
