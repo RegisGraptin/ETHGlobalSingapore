@@ -10,16 +10,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@docsearch/react": "^3.6.1",
     "@ethereumjs/common": "^4.3.0",
     "@ethereumjs/tx": "^5.3.0",
     "@ethereumjs/util": "^9.0.3",
+    "@heroicons/react": "^2.1.5",
+    "@material-tailwind/react": "^2.1.10",
+    "@near-wallet-selector/bitte-wallet": "^8.9.13",
     "@near-wallet-selector/core": "^8.9.13",
     "@near-wallet-selector/here-wallet": "^8.9.13",
     "@near-wallet-selector/meteor-wallet": "^8.9.13",
     "@near-wallet-selector/modal-ui": "^8.9.13",
     "@near-wallet-selector/my-near-wallet": "^8.9.13",
-    "@near-wallet-selector/bitte-wallet": "^8.9.13",
     "@vitejs/plugin-react": "^4.2.1",
+    "apexcharts": "^3.53.0",
     "axios": "^1.6.8",
     "bitcoinjs-lib": "^6.1.5",
     "bn.js": "^5.2.1",
@@ -32,6 +36,7 @@
     "near-api-js": "^5.0.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
+    "react-apexcharts": "^1.4.1",
     "react-dom": "^18.2.0",
     "rxjs": "^7.8.1",
     "viem": "^2.18.4",
@@ -44,10 +49,13 @@
   "devDependencies": {
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
+    "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.12",
     "vite": "^5.1.6"
   }
 }
