@@ -24,6 +24,7 @@ import {PosmTestSetup} from "v4-periphery/test/shared/PosmTestSetup.sol";
 import {FeeMath} from "v4-periphery/test/shared/FeeMath.sol";
 import {IPositionManager} from "v4-periphery/src/interfaces/IPositionManager.sol";
 
+import {PositionInfo, PositionInfoLibrary} from "v4-periphery/src/libraries/PositionInfoLibrary.sol";
 
 import {ReputationSubscriber} from "../../src/ReputationSubscriber.sol";
 
@@ -31,6 +32,7 @@ contract FeeCollectionTest is Test, PosmTestSetup, LiquidityFuzzers {
     using FixedPointMathLib for uint256;
     using CurrencyLibrary for Currency;
     using FeeMath for IPositionManager;
+    using PositionInfoLibrary for PositionInfo;
 
     PoolId poolId;
     address alice = makeAddr("ALICE");
@@ -38,6 +40,8 @@ contract FeeCollectionTest is Test, PosmTestSetup, LiquidityFuzzers {
 
     // expresses the fee as a wad (i.e. 3000 = 0.003e18)
     uint256 FEE_WAD;
+
+    PositionConfig config;
 
     function setUp() public {
         deployFreshManagerAndRouters();
@@ -59,68 +63,51 @@ contract FeeCollectionTest is Test, PosmTestSetup, LiquidityFuzzers {
         // Approve posm for Alice and bob.
         approvePosmFor(alice);
         approvePosmFor(bob);
+
+        config = PositionConfig({poolKey: key, tickLower: -300, tickUpper: 300});
     }
 
+
     
-    // // Subscribe pool manager
-    // function test_subscribe() public {
-
-    //     IPositionManager posm = IPositionManager(address(lpm));
-        
-    //     ReputationSubscriber rpsb = new ReputationSubscriber(lpm);
-    //     ISubscriber mySubscriber = ISubscriber(rpsb);
-        
-    //     uint256 tokenId = lpm.nextTokenId();
-
-    //     bytes memory optionalData = "";
-    //     posm.subscribe(tokenId, address(mySubscriber), optionalData); // FIXME :: Notice we expect address for 'mySubscriber'
-
-    //     mySubscriber.notifySubscribe(tokenId, "");
-    // }
-
-
-    // function test_subscriber_function() public {
-    
-    //     ReputationSubscriber rpsb = new ReputationSubscriber(lpm);
-        
-    //     assertEq(rpsb.computeCurrentReputation(0, alice), 0);
-
-    //     vm.prank(address(lpm));
-    //     rpsb.notifyModifyLiquidity(0, 10, toBalanceDelta(5, 5));
-
-    //     assertEq(rpsb.computeCurrentReputation(0, alice), 0);
-
-    //     console.log(block.timestamp);
-
-    //     // Add some blocks
-    //     vm.warp(100 days);
-
-    //     assertEq(rpsb.computeCurrentReputation(0, alice), 0);
-
-    //     console.log(block.timestamp);
-
-    //     console.log(rpsb.computeCurrentReputation(0, alice));
-
-
-        
-    // }
-
-
-
-    function test_donation(uint256 feeRevenue0, uint256 feeRevenue1) public {
-        feeRevenue0 = bound(feeRevenue0, 0, 100_000_000 ether);
-        feeRevenue1 = bound(feeRevenue1, 0, 100_000_000 ether);
-
-        PositionConfig memory config = PositionConfig({poolKey: key, tickLower: -120, tickUpper: 120});
+    // Subscribe pool manager
+    function test_subscription_register() public {
         uint256 tokenId = lpm.nextTokenId();
-        mint(config, 10e18, address(this), ZERO_BYTES);
+        mint(config, 100e18, alice, ZERO_BYTES);
 
-        // donate to generate fee revenue
-        donateRouter.donate(key, feeRevenue0, feeRevenue1, ZERO_BYTES);
+        // approve this contract to operate on alices liq
+        vm.startPrank(alice);
+        lpm.approve(address(this), tokenId);
+        vm.stopPrank();
 
-        BalanceDelta expectedFees = IPositionManager(address(lpm)).getFeesOwed(manager, config, tokenId);
-        assertApproxEqAbs(uint128(expectedFees.amount0()), feeRevenue0, 1 wei); 
-        assertApproxEqAbs(uint128(expectedFees.amount1()), feeRevenue1, 1 wei);
+        // Create subscription manager
+        ReputationSubscriber rpsb = new ReputationSubscriber(lpm);
+        lpm.subscribe(tokenId, address(rpsb), ZERO_BYTES);
+
+        // successfully subscribe
+        assertEq(lpm.positionInfo(tokenId).hasSubscriber(), true);
+        assertEq(address(lpm.subscriber(tokenId)), address(rpsb));
     }
 
+    // Check reputation user
+    function test_subscription_action() public {
+        uint256 tokenId = lpm.nextTokenId();
+        mint(config, 100e18, alice, ZERO_BYTES);
+
+        // approve this contract to operate on alices liq
+        vm.startPrank(alice);
+        lpm.approve(address(this), tokenId);
+        vm.stopPrank();
+
+        ReputationSubscriber rpsb = new ReputationSubscriber(lpm);
+        lpm.subscribe(tokenId, address(rpsb), ZERO_BYTES);
+
+        // Create subscription manager
+        vm.roll(100);
+        
+        // // Transfer some tokens
+        // lpm.safeTransferFrom(alice, bob, tokenId, "");
+        // uint256 aliceRep = rpsb.getUserReputation(tokenId, alice);
+        // console.logUint(aliceRep);
+
+    }
 }
