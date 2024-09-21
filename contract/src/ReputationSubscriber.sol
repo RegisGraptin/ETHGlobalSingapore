@@ -34,7 +34,7 @@ struct AmountPosition {
 
 contract ReputationSubscriber is PositionManagerSubscriber {
 
-    using StateLibrary for PositionManager;
+    // using StateLibrary for PositionManager;
     using StateLibrary for IPoolManager;
     using PositionInfoLibrary for PositionInfo;
 
@@ -94,7 +94,7 @@ contract ReputationSubscriber is PositionManagerSubscriber {
         uint128 liquidity = posm.getPositionLiquidity(tokenId);
         (PoolKey memory poolKey, PositionInfo info) = posm.getPoolAndPositionInfo(tokenId);
         
-        IPoolManager manager = IPoolManager(address(posm));
+        IPoolManager manager = IPoolManager(posm.poolManager());
         (uint160 sqrtPriceX96,,,) = manager.getSlot0(poolKey.toId());
 
         (uint256 amount0, uint256 amount1) = LiquidityAmounts.getAmountsForLiquidity(
