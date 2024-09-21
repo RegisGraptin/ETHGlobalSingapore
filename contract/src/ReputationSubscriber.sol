@@ -113,6 +113,10 @@ contract ReputationSubscriber is PositionManagerSubscriber {
         }));
     }
 
+
+    function getUserReputation(uint256 tokenId, address user) public view returns (uint256) {
+        return reputation[tokenId].computeCurrentReputation(user);
+    }
     
 }
 
@@ -143,7 +147,6 @@ contract Reputation {
     function removeLiquidity(address user, Position memory position) onlyOwner external {
 
         // Compute for position0
-        
         uint256 amount0 = position.amount0;
         uint256 i = positions0[user].length - 1;
 
